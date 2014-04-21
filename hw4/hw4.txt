@@ -1,0 +1,25 @@
+hw4 info:
+
+Data file quake.txt contains 6 cols of info:
+Col 1: technique descriptor - extraneous
+Col 2: year
+Col 3,4: lat,long
+Col 5: depth under surface; 0 indicates no data
+Col 6: richter scale magnitude of quake
+
+TODO: Produce 5 products from data, as team if want to:
+
+1. Event counter: user enters the following
+	(latitude, longitude, begin year, end year, magnitude threshold)
+	Counter returns values
+	No GUI interface needed
+	Sample output: earthquake occurrences within radius of 100miles
+			from Seattle.
+2. Clustering detection algorithm:
+	cluster events at nearly same lat,long,time
+	output table of clustered events
+	try to represent clustering visually
+3. Use D3 Gallery to plot (lat,long) of events within longitude:[-75:-150]
+4. Use D3 Gallery to make timeline of events > 7.5 magnitude
+5. Use "happy" multiple axis graph, set up with following for X or Y:
+	-longitude, depth, magnitude, year
