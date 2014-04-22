@@ -1,0 +1,18 @@
+\begin{itemize}
+\item np.genfromtxt ended up being useful
+\item not all functions should be verbose. 
+\item how to write out to file (thanks Jordan)
+\item how to use ipython notebook
+\end{itemize}
+
+\paragraph{}About the ipython notebook. It has strengths and weaknesses:
+\paragraph{}Strengths:
+\begin{itemize}
+\item easy to test things out quickly
+\item looks nice when saved to pdf/html
+\end{itemize}
+\paragraph{}Weaknesses:
+\begin{itemize}
+\item difficult to share/reuse code
+\item difficult to save to pdf
+\end{itemize}
