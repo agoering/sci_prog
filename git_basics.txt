@@ -1,0 +1,49 @@
+#basic commands I learned through Try Git on codeschool.com
+
+#initialize repository
+git init
+
+#check your status
+git status
+
+#commit with message
+git commit -m 'message in here'
+
+#amend a commit message
+git commit --amend -m 'replacement message' 
+
+#add a bunch of text (or other) files using wildcard
+git add '*.txt'
+
+#add a remote repository
+git remote add origin https://github.com/try-git/try_git.git
+
+#remember push settings
+git push -u origin master
+
+#pull remotely
+git pull origin master
+
+#diff of most recent commit
+git diff HEAD
+
+#get rid of changes in a file
+git reset file.txt
+
+#revert to a previous stage by last committed file
+git checkout --lastgoodfile.txt
+
+#create a copy for some development/testing/cleanup
+git branch new_branch_name
+
+#switch branch to branch
+git checkout new_branch_name
+
+#switch to master
+git checkout master
+
+#merge branches
+git merge new_branch_name
+
+#delete branch when done with merge
+git -d new_branch_name
