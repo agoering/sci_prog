@@ -1,11 +1,10 @@
 # TODO: Produce 5 products from data, as team if want to:
 #
-# 1. Event counter: user enters the following
+# 1. 
+#   a)Event counter: user enters the following params:
 # 	(latitude, longitude, begin year, end year, magnitude threshold)
-# 	Counter returns values
-# 	No GUI interface needed
-# 	Sample output: earthquake occurrences within radius of 100miles
-# 			from Seattle.
+# 	Counter returns table of values with quakes fitting params
+# 	b)Sample output: return earthquakes within 100mile radius from Seattle.
 # 2. Clustering detection algorithm:
 # 	cluster events at nearly same lat,long,time
 # 	output table of clustered events
@@ -24,29 +23,30 @@
 # Col 5: depth under surface; 0 indicates no data
 # Col 6: richter scale magnitude of quake
 
-# Strategy: use a class to wrap this data.
+""" Parsing: used csh to do cut -c 13-45 quake.txt > quake2.txt
+	then all the cols are sep by 2 spaces with no extraneous info.
+"""
 
 import re
 from collections import Counter
 
-# define a quake object with attributes:
+# define a quake object with following attributes:
 # year, lat, long, depth, mag
 class quake:
 
-	def __init__(self, year, lat, long, depth, mag):
-		self.id = id
-		self.lat = []
-		self.long = []
-		self.beg = []
-		self.end = []
-		self.mag = []
+	def __init__(self, year, lat, lon, depth, mag):
+		# self.id = id
+		self.year = year
+		self.lat = lat
+		self.long = lon
+		self.depth = depth
+		self.mag = mag
 
-	def pressure_min(self):
-		nonzero_pressure = [x for x in self.pressure if x >0]
-		if len(nonzero_pressure) == 0:
-			return None
-		else:
-			return min(nonzero_pressure)
-
-	def pressure_max(self):
-		return max(self.pressure)
+#make a list of quake objects and put in data
+quake_list = []
+with open('../data/quake2.txt','r') as f:
+	for line in f:
+		s = re.split("  +", line)
+		new_quake = quake(s[0],s[1],s[2],s[3],s[4])
+		quake_list.append(new_quake)
+#make a change
