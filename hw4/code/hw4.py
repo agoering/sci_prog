@@ -15,7 +15,6 @@
 # 	-longitude, depth, magnitude, year
 #    See http://d131-92.uoregon.edu/Sandbox/happy/
 
-# Parsing the data file:
 # Data file ./data/quake.txt contains 6 cols of info sep by 2 spaces.
 # Col 1: technique descriptor - extraneous, 
 # Col 2: year
@@ -24,7 +23,8 @@
 # Col 6: richter scale magnitude of quake
 
 """ Parsing: used csh to do cut -c 13-45 quake.txt > quake2.txt
-	then all the cols are sep by 2 spaces with no extraneous info.
+	to get rid of the technique descriptor
+	then all the cols are sep by 2 spaces. Read in to a quake class.
 """
 
 import re
@@ -34,19 +34,58 @@ from collections import Counter
 # year, lat, long, depth, mag
 class quake:
 
-	def __init__(self, year, lat, lon, depth, mag):
+	def __init__(self, year, lat, long, depth, mag):
 		# self.id = id
 		self.year = year
 		self.lat = lat
-		self.long = lon
+		self.long = long
 		self.depth = depth
 		self.mag = mag
+
+	def getAll(self):
+		return [self.year,self.lat,self.long,self.depth,self.mag]
+		# return attributes
 
 #make a list of quake objects and put in data
 quake_list = []
 with open('../data/quake2.txt','r') as f:
 	for line in f:
 		s = re.split("  +", line)
-		new_quake = quake(s[0],s[1],s[2],s[3],s[4])
+		new_quake = quake(int(s[0]),float(s[1]),float(s[2]),float(s[3]),float(s[4]))
 		quake_list.append(new_quake)
-#make a change
+
+# begYear1 = 2002
+# endYear1 = 2008
+# print endYear1
+# if begYear1 <= quake_list[12874].year and endYear1 >= quake_list[12874].year:
+# 	print 'yes'
+# else:
+# 	print 'no'
+
+# print 'yes' if begYear1 <= quake_list[12874].year <= endYear1 else 'no'
+
+"""
+The event counter should be a function that takes input params:
+	(minLatitude, maxLatitude, minLongitude, maxLongitude, beginYear, endYear,
+	 magnitudeThreshold)
+	and returns table (or list of list) of quakes in that time range, 
+	in that location range,	above the magnitude threshold.
+"""
+# print quake_list[0].attributes()
+# quake.quakeAttr(quake_list[0])
+# def filterQuakes(begYear,endYear):
+# 	by_year = [quake for quake in quake_list if begYear <= quake.year <= endYear]
+
+# 	filterResults = by
+# filterQuakes(2002,2004)
+
+print quake_list[1].getAll()
+
+
+
+
+
+
+
+
+
