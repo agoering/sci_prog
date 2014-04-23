@@ -1,6 +1,6 @@
 # TODO: Produce 5 products from data, as team if want to:
 #
-# 1. 
+# 1. DONE-ish.
 #   a)Event counter: user enters the following params:
 # 	(latitude, longitude, begin year, end year, magnitude threshold)
 # 	Counter returns table of values with quakes fitting params
@@ -28,6 +28,7 @@
 """
 
 import re
+import math
 
 # define a quake object with following attributes:
 # year, lat, long, depth, mag
@@ -43,7 +44,24 @@ class quake:
 
 	def getAll(self):
 		return [self.year,self.lat,self.lon,self.depth,self.mag]
-		# return attributes
+		# return all quake attributes
+	
+	# Find distance of quake from "origin" point of interest
+	# Modified by 'longLatToDist.py' by Wayne Dyck
+	def distanceFrom(self, origin):
+	    lat1, lon1 = origin
+	    lat2, lon2 = self.lat, self.lon
+	    radius = 6378 # km
+	    # radius = 6378/1.609 #miles
+
+	    dlat = math.radians(lat2-lat1)
+	    dlon = math.radians(lon2-lon1)
+	    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+	        * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+	    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+	    d = radius * c
+
+	    return d
 
 #make a list of quake objects and put in data
 quake_list = []
@@ -52,7 +70,6 @@ with open('../data/quake2.txt','r') as f:
 		s = re.split("  +", line)
 		new_quake = quake(int(s[0]),float(s[1]),float(s[2]),float(s[3]),float(s[4]))
 		quake_list.append(new_quake)
-
 
 """
 The event counter should be a function that takes input params:
@@ -78,6 +95,7 @@ with open("../output/var_limits.txt","w") as output:
 		"[minYear,maxYear,minLat,maxLat,minLon,maxLon,minMag,maxMag],\n"
 + str([minYear,maxYear,minLat,maxLat,minLon,maxLon,minMag,maxMag]))
 
+# may want to combine function with user input and output file
 def filterQuakes(begYear,endYear,begLat,endLat,begLon,endLon,magThresh):
 	filtered = [quake.getAll() for quake in quake_list \
 	if begYear <= quake.year <= endYear and \
@@ -85,15 +103,37 @@ def filterQuakes(begYear,endYear,begLat,endLat,begLon,endLon,magThresh):
 	begLon <= quake.lon <= endLon and\
 	magThresh <= quake.mag
 	]
-
 	return filtered
 
-filtered = filterQuakes(1900, 2007, -71.0, 86.7, -180.0, 180.0, 5.5)
+# output file: call filtered = filterQuakes(...) first
+# with open("../output/filter.txt","w") as output:
+# for i in range(len(filtered)):
+# 	output.write(str(filtered[i]))
+# 	output.write(",\n")
 
-print len(filtered), len(quake_list)
+# allquakes = filterQuakes(1900, 2007, -71.0, 86.7, -180.0, 180.0, 5.5)
+# length of all quakes matches length of quake list. Good.
+# print len(allquakes) == len(quake_list)
 
-with open("../output/hw4_out.txt","w") as output:
-	for i in range(len(filtered)):
-		output.write(str(filtered[i]))
-		output.write(",\n")
+
+"""Filtering all the quakes a certain distance from a given point
+	seems like a different job than filtering within a range of params.
+	So I'm using a different function, which I defined as a method in the
+	quake class as distanceFrom.
+"""
+#taking the lat,long of cities from wherever Google Maps drops the search pin
+seattle = (47.7, -122.3)
+christchurch = (-43.5,172.6)
+
+def proximityTo(place,miles):
+	proximal = [quake.getAll() for quake in quake_list \
+	if quake.distanceFrom(place) <= miles]
+	return proximal
+
+# I find three quakes in 100 miles of Seattle - a 6.6 in 1949, a 6.5 in 1965,
+# a 5.8 in 1996, and a 6.8 in 2001.
+print proximityTo(seattle,100)
+
+
+
 
