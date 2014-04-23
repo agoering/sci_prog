@@ -1,0 +1,2 @@
+[minYear,maxYear,minLat,maxLat,minLon,maxLon,minMag,maxMag],
+[1900, 2007, -71.0, 86.7, -180.0, 180.0, 5.5, 9.6]

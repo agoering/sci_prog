@@ -28,22 +28,21 @@
 """
 
 import re
-from collections import Counter
 
 # define a quake object with following attributes:
 # year, lat, long, depth, mag
 class quake:
 
-	def __init__(self, year, lat, long, depth, mag):
+	def __init__(self, year, lat, lon, depth, mag):
 		# self.id = id
 		self.year = year
 		self.lat = lat
-		self.long = long
+		self.lon = lon
 		self.depth = depth
 		self.mag = mag
 
 	def getAll(self):
-		return [self.year,self.lat,self.long,self.depth,self.mag]
+		return [self.year,self.lat,self.lon,self.depth,self.mag]
 		# return attributes
 
 #make a list of quake objects and put in data
@@ -54,38 +53,47 @@ with open('../data/quake2.txt','r') as f:
 		new_quake = quake(int(s[0]),float(s[1]),float(s[2]),float(s[3]),float(s[4]))
 		quake_list.append(new_quake)
 
-# begYear1 = 2002
-# endYear1 = 2008
-# print endYear1
-# if begYear1 <= quake_list[12874].year and endYear1 >= quake_list[12874].year:
-# 	print 'yes'
-# else:
-# 	print 'no'
-
-# print 'yes' if begYear1 <= quake_list[12874].year <= endYear1 else 'no'
 
 """
 The event counter should be a function that takes input params:
-	(minLatitude, maxLatitude, minLongitude, maxLongitude, beginYear, endYear,
+	(beginYear, endYear, begLatitude, endLatitude, begLongitude, endLongitude, 
 	 magnitudeThreshold)
+	nicknamed (begYear,endYear,begLat,endLat,begLon,endLon,magThresh)
 	and returns table (or list of list) of quakes in that time range, 
-	in that location range,	above the magnitude threshold.
+	in that location range,	above the magnitude threshold. 
+	It will help to know the limits of those params also.
 """
-# print quake_list[0].attributes()
-# quake.quakeAttr(quake_list[0])
-# def filterQuakes(begYear,endYear):
-# 	by_year = [quake for quake in quake_list if begYear <= quake.year <= endYear]
+#calculate limits
+minYear = min(quake.year for quake in quake_list)
+maxYear = max(quake.year for quake in quake_list)
+minLat = min(quake.lat for quake in quake_list)
+maxLat = max(quake.lat for quake in quake_list)
+minLon = min(quake.lon for quake in quake_list)
+maxLon = max(quake.lon for quake in quake_list)
+minMag = min(quake.mag for quake in quake_list)
+maxMag = max(quake.mag for quake in quake_list)
 
-# 	filterResults = by
-# filterQuakes(2002,2004)
+with open("../output/var_limits.txt","w") as output:
+	output.write(\
+		"[minYear,maxYear,minLat,maxLat,minLon,maxLon,minMag,maxMag],\n"
++ str([minYear,maxYear,minLat,maxLat,minLon,maxLon,minMag,maxMag]))
 
-print quake_list[1].getAll()
+def filterQuakes(begYear,endYear,begLat,endLat,begLon,endLon,magThresh):
+	filtered = [quake.getAll() for quake in quake_list \
+	if begYear <= quake.year <= endYear and \
+	begLat <= quake.lat <= endLat and \
+	begLon <= quake.lon <= endLon and\
+	magThresh <= quake.mag
+	]
 
+	return filtered
 
+filtered = filterQuakes(1900, 2007, -71.0, 86.7, -180.0, 180.0, 5.5)
 
+print len(filtered), len(quake_list)
 
-
-
-
-
+with open("../output/hw4_out.txt","w") as output:
+	for i in range(len(filtered)):
+		output.write(str(filtered[i]))
+		output.write(",\n")
 
