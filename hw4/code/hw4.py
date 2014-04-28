@@ -51,8 +51,8 @@ class quake:
 	def distanceFrom(self, origin):
 	    lat1, lon1 = origin
 	    lat2, lon2 = self.lat, self.lon
-	    radius = 6378 # km
-	    # radius = 6378/1.609 #miles
+	    # radius = 6378 # km
+	    radius = 6378/1.609 #miles
 
 	    dlat = math.radians(lat2-lat1)
 	    dlon = math.radians(lon2-lon1)
@@ -130,8 +130,10 @@ def proximityTo(place,miles):
 	if quake.distanceFrom(place) <= miles]
 	return proximal
 
-# I find three quakes in 100 miles of Seattle - a 6.6 in 1949, a 6.5 in 1965,
-# a 5.8 in 1996, and a 6.8 in 2001.
+# I find six quakes within 100 miles of Seattle:
+# [[1949, 47.1, -122.392, 30.0, 6.5], [1965, 47.3, -122.333, 65.7, 6.5], 
+# [1980, 46.3, -121.994, 15.0, 5.5], [1996, 47.8, -121.745, 8.7, 5.8], 
+# [1999, 47.0, -123.234, 48.9, 5.6], [2001, 47.0, -122.58, 54.0, 6.8]]
 print proximityTo(seattle,100)
 
 
