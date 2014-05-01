@@ -1,7 +1,7 @@
 """Problem Statements"""
-# (need to make flat slope vectors) 1. Average the 3 months and differentiate this curve in 5 year intervals. Plot the resulting slope vectors. Use a finite element approach or another way.
+# (DONE) 1. Average the 3 months and differentiate this curve in 5 year intervals. Plot the resulting slope vectors. Use a finite element approach or another way.
 
-# 2. Use a numerical integration technique to compute the total area of the curve from 1870 to 1950 - compare that to the area under the curve from 1950 to 2013
+# (DONE) 2. Use a numerical integration technique to compute the total area of the curve from 1870 to 1950 - compare that to the area under the curve from 1950 to 2013
 
 # 3. Smooth the waveform (see http://homework.uoregon.edu/pub/class/355/noise.html) via:
 # 	a) boxcar of width 5 years
@@ -38,62 +38,56 @@ ice = np.array(ice)
 # 	print np.mean(ice[0:5,i+1])
 # print np.mean(ice[0:5,1:]) #average of temps in all 3 months over 5 years
 
-"""Data Manipulations - averages, slopes, integration"""
+"""Functions - averages, slopes, integration"""
+
+def get_average(data,step):
+	"""Finds average ice extent of 3 months in dataset given year step size"""
+	average = []
+	i = 0
+	while i < len(ice):
+		year = ice[i,0]
+		area = np.mean(ice[i:i+step,1:])
+		average.append([year,area])
+		i += step
+	average = np.array(average)
+	return average
+
+def get_slope(averaged_data):
+	"""Finds slope of averaged data."""
+	slope =  []
+	for i in range(len(averaged_data)-1):
+		slope.append([averaged_data[i,0],(averaged_data[i+1,1]-averaged_data[i,1])/5])
+		slope.append([averaged_data[i,0]+1,(averaged_data[i+1,1]-averaged_data[i,1])/5])
+		slope.append([averaged_data[i,0]+2,(averaged_data[i+1,1]-averaged_data[i,1])/5])
+		slope.append([averaged_data[i,0]+3,(averaged_data[i+1,1]-averaged_data[i,1])/5])
+		slope.append([averaged_data[i,0]+4,(averaged_data[i+1,1]-averaged_data[i,1])/5])
+	slope = np.array(slope)
+	return slope
+
+def integrate(start,stop):
+	"""Integrates under flat slope curve, starting and stopping on specified years"""
+	#value of slope
+	i = start - 1870
+	integral = 0
+	while i < stop - 1870:
+		integral += 5*slope[i,1]
+		i += 5
+	return integral
+
 #one year average
-annual_average = []
-i = 0
-step = 1
-while i < len(ice):
-	year = ice[i,0]
-	area = np.mean(ice[i:i+step,1:])
-	annual_average.append([year,area])
-	i += step
-annual_average = np.array(annual_average)
+annual_average = get_average(ice,1)
 
-#five year average
-ice_average = []
-i = 0
-step = 5
-while i < len(ice):
-	year = ice[i,0]
-	area = np.mean(ice[i:i+step,1:])
-	ice_average.append([year,area])
-	i += step
-ice_average = np.array(ice_average)
+#five year average - excludes 2010-2013 data
+ice_average = get_average(ice,5)
 
-# print (ice_average)
-# print len(ice_average)
-#flat line slope, five year average
-slope =  []
-for i in range(len(ice_average)-1):
-	slope.append([ice_average[i,0],(ice_average[i+1,1]-ice_average[i,1])/5])
-	slope.append([ice_average[i,0]+1,(ice_average[i+1,1]-ice_average[i,1])/5])
-	slope.append([ice_average[i,0]+2,(ice_average[i+1,1]-ice_average[i,1])/5])
-	slope.append([ice_average[i,0]+3,(ice_average[i+1,1]-ice_average[i,1])/5])
-	slope.append([ice_average[i,0]+4,(ice_average[i+1,1]-ice_average[i,1])/5])
-slope = np.array(slope)
-print slope
+#flat line slope, five year average - excludes 2010-2013 data
+slope = get_slope(ice_average)
 
-
-# step = 5
-# i = 0
-# while i < len(ice_average):
-# 	# print ice_average[i,0]
-# 	i += 1
-# 	years = [l for l in ice[ice_average[i,0]:ice_average[i+5,0],0]]
-# 	upper = ice_average(j+5,1)
-# 	lower = ice_average(j,1)
-# 	slope_value = (upper-lower)/step
-
-#  i in range(len(ice_average)-1):
-# 	slope.append([ice_average[i,0]+step/2,(ice_average[i+1,1]-ice_average[i,1])/step])
-# slope = np.array(slope)
-
-# puts slope point in middle of year range
-# slope = []
-# for i in range(len(ice_average)-1):
-# 	slope.append([ice_average[i,0]+step/2,(ice_average[i+1,1]-ice_average[i,1])/step])
-# slope = np.array(slope)
+# change of sea ice extent
+early = integrate(1870,1950) # 0.166
+late = integrate(1950,2009) # 03.055
+# print early
+# print late
 
 """Plots"""
 plt.figure(0)
@@ -119,6 +113,9 @@ plt.savefig('../output/annual_ratio')
 
 plt.figure(3)
 plt.plot(slope[:,0],slope[:,1])
+plt.xlabel('Year')
+plt.ylabel('Rate of change, square kilometers/year')
+plt.title('Rate of change of area of June-September Arctic sea ice extent, 5 year averages')
 plt.savefig('../output/slope')
 
 plt.figure(4)
