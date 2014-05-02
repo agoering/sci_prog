@@ -1,0 +1,22 @@
+\ProvidesPackage{mystyle}
+
+\usepackage{graphicx}
+\usepackage[super]{natbib} %makes references superscripts instead of brackets.
+% \usepackage[margin=1in]{geometry}
+% \usepackage[tight,nice]{units}
+\usepackage{color,float,amsmath,amssymb}
+\usepackage[emulate=units]{siunitx}
+\usepackage[final]{pdfpages} %Includes pdf pages - \includepdf[pages=3-6]{insertme.pdf} To insert the whole of insertme.pdf: \includepdf[pages=-]{insertme.pdf}
+\usepackage{todonotes}
+\usepackage[colorlinks=true,linkcolor=black]{hyperref}
+
+%the myfigure command takes the figure name, label, and caption as options.
+\newcommand{\myfigure}[3]{
+\begin{figure}
+\centering
+ \includegraphics[width=\textwidth][height=0.5\textheight{#1}
+ \label{#2}
+ \caption{#3}
+\end{figure}
+}
+

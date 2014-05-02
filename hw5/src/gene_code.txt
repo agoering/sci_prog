@@ -1,0 +1,572 @@
+\begin{minted}{python}
+# -*- coding: utf-8 -*-
+# <nbformat>2</nbformat>
+
+# <codecell>
+
+infile = open("iceData.txt","r") ## read the data file
+content = infile.read()
+infile.close()
+lines = content.split('\n') ## split up lines
+#print lines
+
+# <codecell>
+
+data = []
+for each in lines:  ## split each line into separate strings
+    if len(each) < 1:
+        continue          ## get rid of the empty list at the end
+    temp = each.split()
+    data.append(temp)     ## data contains lists of data for each year
+print data
+## data contains year, July, August, and September ice extent in square kilometers
+
+# <codecell>
+
+dataNum = []  ## this will hold data converted to floating point types
+for each in data:
+    templine = []
+    for i in range(0, len(each)):  ## convert element in each line to float
+        temp = float(each[i])
+        templine.append(temp)
+    dataNum.append(templine)  ## write lists of floats to array dataNum
+print dataNum
+
+# <codecell>
+
+avgExt = []   ## this array will hold year and its corresponding summer average extent of ice
+for each in dataNum:
+    avg = round((each[1] + each[2] + each[3])/3., 2)  ## round to 2 decimal places
+    temp = [int(each[0]), avg]
+    avgExt.append(temp)
+print avgExt
+print len(avgExt)
+
+# <codecell>
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+julyExt = []  ## make plots of the data for the three months and average ice
+augExt = []   ## extent over the years to get an idea of what the data looks like 
+septExt = []
+
+for each in dataNum:
+    temp1 = [int(each[0]), each[1]]
+    julyExt.append(temp1)
+    temp2 = [int(each[0]), each[2]]
+    augExt.append(temp2)
+    temp3 = [int(each[0]), each[3]]
+    septExt.append(temp3)
+
+def plotData(monthData, month, plotVal):
+    x_val = [x[0] for x in monthData]
+    y_val = [x[1] for x in monthData]
+    plt.plot(x_val,y_val, plotVal)
+    plt.suptitle('Extent of Arctic ice in ' + month)
+    plt.xlabel('year')
+    plt.ylabel('extent in square kilometers')
+    return plt.show()
+    
+plotData(julyExt, 'July', 'bo')
+plt.savefig("Ice-extent-July.png")
+plotData(augExt, 'August', 'bo')
+plt.savefig("Ice-extent-August.png")
+plotData(septExt, 'September', 'bo')
+plt.savefig("Ice-extent-September.png")
+plotData(avgExt, 'average over three Summer months', 'ro')
+plt.savefig("Ice-extent-ThreeMonthsAverage.png")
+
+# <codecell>
+
+z = [x[0] for x in avgExt]
+y1 = [x[1] for x in julyExt]
+y2 = [x[1] for x in augExt]
+y3 = [x[1] for x in septExt]
+y4 = [x[1] for x in avgExt]
+
+fig = plt.figure(figsize=(10, 10))
+plt.xlabel('year')
+plt.ylabel('extent of ice in square kilometers')
+plt.title(r'Extent of Arctic ice')
+plt.plot(z, y1, label=r'July', color='cyan')
+plt.plot(z, y2, label=r'August', color='blue')
+plt.plot(z, y3, label=r'September', color='green')
+plt.plot(z, y4, label=r'Three months average', color='red')
+plt.legend(loc='lower left')
+plt.show()
+plt.savefig("Ice-extent.png")
+
+# <codecell>
+
+#from numpy import gradient
+dx = 5
+x = [] ## holds values of years
+y = [] ## holds values of corresponding extents of ice
+dy = [] ## five year differences
+dydx = [] ## slopes over five years
+xmid = [] ## midpoint for each five year interval
+for each in avgExt:
+    temp = each[0]
+    x.append(temp)
+    temp1 = each[1]
+    y.append(temp1)
+#print x
+#print y
+for i in range(0, len(y)-dx):
+    temp = y[i+dx]-y[i]
+    dy.append(temp)
+    temp1 = temp/dx
+    dydx.append(temp1)
+    temp2 = float(x[i+dx]+x[i])/2.
+    xmid.append(temp2)
+#print dydx
+#print xmid
+#print len(dydx)
+#print len(xmid)
+
+# <codecell>
+
+z = [x for x in xmid]
+y = [x for x in dydx]
+
+fig = plt.figure(figsize=(10, 10))
+plt.xlabel('year')
+plt.ylabel('rate of change in square kilometers per year')
+plt.title(r'rate of change of extent of Arctic ice')
+plt.plot(z, y, color='blue')
+plt.show()
+plt.savefig("rate-of-change-of-extent.png")
+
+# <codecell>
+
+rate = []  ## this is the rate of change of Arctic sea ice extent
+for i in range(0, len(dydx)):
+    temp = [xmid[i], dydx[i]]
+    rate.append(temp)
+
+upTo1950 = []
+after1950 = []
+for each in rate:
+    temp = each[1]
+    if each[0] < 1950:
+        upTo1950.append(temp)
+    else:
+        after1950.append(temp)
+#print upTo1950
+#print after1950
+
+# <codecell>
+
+## compute the area under above curve to find the change in extent of ice
+from scipy.integrate import simps, trapz
+
+## dx indicates the spacing of the data along the x axis.
+
+## Compute the area using the composite trapezoidal rule.
+areaUpTo1950 = trapz(upTo1950, dx=1)
+#print "area up to 1950 using trapezoidal rule =", areaUpTo1950
+areaAfter1950 = trapz(after1950, dx=1)
+#print "area after 1950 using trapezoidal rule =", areaAfter1950
+## Compute the area using the composite Simpon's rule.
+areaUpTo1950 = simps(upTo1950, dx=1)
+#print "area up to 1950 using Simpson's rule =", areaUpTo1950
+areaAfter1950 = simps(after1950, dx=1)
+ratio = areaAfter1950/areaUpTo1950
+print "change in extent of sea ice up to 1950 =", round(areaUpTo1950, 2), "square kilometers"
+print "change in extent of sea ice after 1950 =", areaAfter1950, "square kilometers"
+print "ratio after 1950 to that before =", round(ratio, 2)
+
+# <codecell>
+
+extent = []  ## this will hold all the values of average extent data
+for each in avgExt:
+    temp = each[1]
+    extent.append(temp)
+print extent
+    
+    ##  this does not do a good job at the end because of "residuals"
+#def runningMean(x, N):  ## this will compute the running mean over N values
+#    y = np.zeros((len(x),))
+#    for ctr in range(len(x)):
+#         y[ctr] = np.sum(x[ctr:(ctr+N)])
+#    return y/N
+#avgExtBoxSmooth = runningMean(extent, 3)
+
+# <codecell>
+
+#import scipy
+#from scipy.signal import boxcar
+
+## try it using a built-in Python function
+#boxSmooth = boxcar(extent)
+#print boxSmooth
+
+## The following algorithm smoothes data using n-point sliding box-car 
+## smoothing. Stolen from http://users.aims.ac.za/~mike/python/env_modelling.html
+## this is a better algorithm because it takes care of the "residuals" by 
+## reflecting the data around the endpoints
+
+def smoother(x, n):
+     x_smooth = []
+     L = len(x)
+     store = zeros((n,1), float)  ## array of zeroes for each group of 
+     for u in range(0, L-n):      ## used to produce smoothed value
+          for v in range(0, n):  ##  add the values and divide by their number
+               store[v] = x[u+v]
+          av = float(sum(store)) / n  ## repeat for each value at center
+          x_smooth.append(av)
+     for u in range(L-n,L):  ## this takes care of the "residual" at the end
+          for v in range(0, L-u-1):  ## average the values and find the smoothed value
+               store[v] = x[u+v]
+          av = float(sum(store)) / n
+          x_smooth.append(av)
+     return x_smooth
+                    
+avgExtBoxSmooth = smoother(extent, 5)  ## data smoothed over interval of 5 years
+print avgExtBoxSmooth
+print len(avgExtBoxSmooth)
+
+# <codecell>
+
+year = []
+avgExtBox = []
+for each in avgExt:
+    temp = each[0]
+    year.append(temp)
+for i in range(0, len(year)):
+    temp = [year[i], avgExtBoxSmooth[i]]
+    avgExtBox.append(temp)
+
+# <codecell>
+
+z = [x[0] for x in avgExtBox]
+y1 = [x[1] for x in avgExt]
+y2 = [x[1] for x in avgExtBox]
+
+fig = plt.figure(figsize=(10, 10))
+plt.xlabel('year')
+plt.ylabel('extent of ice in square kilometers')
+plt.title(r'comparing extent of Arctic ice data with data smoothed with Boxcar filter')
+plt.plot(z, y1, label=r'raw data', color='red')
+plt.plot(z, y2, label=r'smoothed data', color='blue')
+plt.legend(loc='lower left')
+plt.show()
+plt.savefig("Ice-extent-Boxcar-smoothed.png")
+
+# <codecell>
+
+def smootherGauss(x, n):
+     coeff = [0.067, 0.242, 0.383, 0.242, 0.067]
+## these are coefficients corresponding to Gaussian kernel of width 5
+## taken from the web page homepages.inf.ed.ac.uk/rbf/HIPR2/gsmooth.htm
+     x_smooth = []
+     L = len(x)
+     store = zeros((n,1), float)  ## array of zeroes for each group of 
+     for u in range(0, L-n):      ## used to produce smoothed value
+          for v in range(0, n):   ##  add the values multiplied by gaussian coefficients
+               store[v] = x[u+v]
+          av = 0
+          for i in range(0, len(coeff)):
+               av += float(coeff[i]) * float(store[i])
+          x_smooth.append(av)
+     for u in range(L-n,L):  ## this takes care of the "residuals" at the end
+          for v in range(0, L-u-1):  ## average the values and find the smoothed value
+               store[v] = x[u+v]
+          av = 0
+          for i in range(0, len(coeff)):
+               av += float(coeff[i]*store[i])
+          x_smooth.append(av)
+     return x_smooth
+                    
+avgExtGaussSmooth = smootherGauss(extent, 5)  ## data smoothed over interval of 5 years
+print avgExtGaussSmooth
+print len(avgExtGaussSmooth)
+
+# <codecell>
+
+avgExtGauss = []
+for i in range(0, len(year)):
+    temp = [year[i], avgExtGaussSmooth[i]]
+    avgExtGauss.append(temp)
+
+z = [x[0] for x in avgExtGauss]
+y1 = [x[1] for x in avgExt]
+y2 = [x[1] for x in avgExtGauss]
+fig = plt.figure(figsize=(10, 10))
+plt.xlabel('year')
+plt.ylabel('extent of ice in square kilometers')
+plt.title(r'comparing extent of Arctic ice data with data smoothed with Gaussian filter')
+plt.plot(z, y1, label=r'raw data', color='red')
+plt.plot(z, y2, label=r'smoothed data', color='blue')
+plt.legend(loc='lower left')
+plt.show()
+plt.savefig("Ice-extent-Gaussian-smoothed.png")
+
+# <codecell>
+
+## in exponential smoothing each value is defined as
+## s[0] = x[0] and s[t] = a x[t-1] + (1-a) s[t-1]
+## where 0<a<1 is smoothing parameter.  Larger values of a
+## give more weight to recent data but smoothing is worse
+def smootherExp(x, a):
+    x_smooth = []
+    L = len(x)
+    x_smooth.append(x[0])
+    for u in range(1, L):
+        store = a * float(x[u-1]) + (1-a) * float(x_smooth[u-1])
+        x_smooth.append(store)
+    return x_smooth
+avgExtExpSmooth = smootherExp(extent, .7)  ## data smoothed over interval of 5 years
+print avgExtExpSmooth
+print len(avgExtExpSmooth)
+
+# <codecell>
+
+avgExtExp = []
+for i in range(0, len(year)):
+    temp = [year[i], avgExtExpSmooth[i]]
+    avgExtExp.append(temp)
+
+z = [x[0] for x in avgExtExp]
+y1 = [x[1] for x in avgExt]
+y2 = [x[1] for x in avgExtExp]
+fig = plt.figure(figsize=(10, 10))
+plt.xlabel('year')
+plt.ylabel('extent of ice in square kilometers')
+plt.title(r'comparing extent of Arctic ice data with data smoothed with exponential filter')
+plt.plot(z, y1, label=r'raw data', color='red')
+plt.plot(z, y2, label=r'smoothed data', color='blue')
+plt.legend(loc='lower left')
+plt.show() 
+plt.savefig("Ice-extent-exponential-smoothed.png")
+
+# <codecell>
+
+z = [x for x in year]
+y = [x for x in extent]
+y1 = [x for x in avgExtBoxSmooth]
+y2 = [x for x in avgExtGaussSmooth]
+y3 = [x for x in avgExtExpSmooth]
+fig = plt.figure(figsize=(10, 10))
+plt.xlabel('year')
+plt.ylabel('extent of ice in square kilometers')
+plt.title(r'comparing extent of Arctic ice data with data smoothed with different filters')
+plt.plot(z, y, label=r'raw data', color='red')
+plt.plot(z, y1, label=r'boxcart smoothed ', color='blue')
+plt.plot(z, y2, label=r'gaussian smoothed', color='magenta')
+plt.plot(z, y3, label=r'exponential smoothed ', color='cyan')
+plt.legend(loc='lower left')
+plt.show()
+plt.savefig("Ice-extent-smoothed-comparison.png")
+
+# <codecell>
+
+import pylab as P
+
+## find the ratio between yearly July and September ice extents
+july = [x[1] for x in julyExt]
+aug = [x[1] for x in augExt]
+sept = [x[1] for x in septExt]
+ratioJulyToSept = []
+for i in range(len(july)):
+    temp = float(july[i]) / float(sept[i])
+    ratioJulyToSept.append(temp)
+#z = [x for x in year]
+#y = [x for x in ratioJulyToSept]
+#plt.xlabel('year')
+#plt.ylabel('ratio of ice extent')
+#plt.title(r'ratio of extent of Arctic ice in July to that in September ')
+#plt.plot(z, y, color='red')
+#plt.bar(z, y)
+#plt.show()
+#plt.savefig("Ice-extent-comparison-ratio-July-September.png")
+
+plt.xlabel('ratio of ice extent')
+plt.ylabel('number of occurences')
+plt.title(r'histogram ratio of extent of Arctic ice in July to that in September ')
+plt.hist(ratioJulyToSept)
+plt.show()
+plt.savefig("Ice-extent-histogram-ratio-July-September.png")
+
+# <codecell>
+
+from numpy import *
+from matplotlib.pyplot import *
+
+coefficients = polyfit(year, extent, 6)
+polynomial = poly1d(coefficients)
+xs = arange(1860, 2030, 1)
+ys = polynomial(xs)
+zeroes = roots(coefficients)
+#print zeroes
+for each in zeroes:    ## find the year at which ice extent goes to zero
+    if int(each.real) > 2000:
+        zero = int(each.real)
+print "according to our fit Arctic ice will melt in the year", zero
+fig = plt.figure(figsize=(10, 10))
+plot(year, extent, 'o')
+plot(xs, ys)
+ylabel('extent of Arctic sea ice in square kilometers')
+xlabel('year')
+title(r'polynomial fit to averaged data for Arctic ice extent ')
+show()
+savefig("Ice-extent-polynomial-fit.png")
+
+# <codecell>
+
+plotData(avgExt, 'average over three Summer months', 'ro')
+
+# <codecell>
+
+## fit an exponential curve to noisy data to check if exponential fit works
+from scipy.optimize import curve_fit
+
+def fitFunc(t, a, b, c):
+    return a*np.exp(-b*t) + c  ## x is the x-axis
+x = np.linspace(0,4,50)
+y = fitFunc(x, 2.5, 1.3, 0.5)
+yn = y + 0.2*np.random.normal(size=len(x)) ## noisy function
+fitParams, fitCovariances = curve_fit(fitFunc, x, yn) ## yn is the function to fit to
+## The scipy.optimize module contains a least squares curve fit routine 
+## that requires as input a user-defined fitting function (in our case fitFunc ),
+## the x-axis data (in our case, t) and the y-axis data (in our case, noisy). 
+## The curve_fit routine returns an array of fit parameters, and a matrix of 
+## covariance data (the square root of the diagonal values are the 1-sigma 
+## uncertainties on the fit parameters—provided you have a reasonable fit in 
+## the first place.):
+print fitParams
+
+# <codecell>
+
+## found it impossible to find the right fitting parameters for exponential fit
+x = np.array(year)
+y = np.array(extent)
+#print x
+#print y
+def fitFunc(t, a, b, c):
+    return a*np.exp(b*t) + c 
+## try this set of parameters to find an initial guess
+popt = [-.00000001, .01, 10]
+plot(x,fitFunc(x,*popt))
+show()
+
+## use initial guess to get closer
+fitParams, fitCovariances = curve_fit(fitFunc, x, y, [-.00000001, .01, 10])
+print fitParams
+## still doesn't seem to be able to optimize
+
+# <codecell>
+
+## now let's look at the window 1900 - 1960 to find the alleged cooling events:
+cooling = []
+for each in avgExt:
+    if each[0] > 1920 and each[0] < 1960:
+        temp = [each[0],each[1]]
+        cooling.append(temp)
+x_val = [x[0] for x in cooling]
+y_val = [x[1] for x in cooling]
+fig = plt.figure(figsize=(10, 10))
+plot(x_val,y_val, 'ro')
+suptitle('Extent of Arctic ice during cooling periods')
+xlabel('year')
+ylabel('extent in square kilometers')
+## put vertical lines at the beginning and end of cooling window
+axvline(x=1933)
+axvline(x=1936)
+axvline(x=1945)
+axvline(x=1953)
+show()
+savefig("Ice-extent-cooling-windows.png")
+
+# <codecell>
+
+## it looks like first cooling period begins in 1933 and ends in 1936
+## and the second cooling period begins in 1945 and ends in 1953
+## since we already have the derivative function dydx, we can simply
+## find the area under this curve for the time periods we are interested in:
+firstWindow = []
+secondWindow = []
+for each in rate: ## rate holds the midpoints and corresponding derivatives
+    temp = each[1]
+    if each[0] > 1933 and each[0] < 1936:
+        firstWindow.append(temp)
+    elif each[0] > 1945 and each[0] < 1950:
+        secondWindow.append(temp)
+print firstWindow
+print secondWindow
+## in the second window going up to 1950 only to account for increase in ice coverage
+
+# <codecell>
+
+## Compute the area using the composite Simpon's rule.
+areaFirstWindow = simps(firstWindow, dx=1)
+areaSecondWindow = simps(secondWindow, dx=1)
+print areaFirstWindow
+print areaSecondWindow
+
+firstRatio = areaFirstWindow/areaUpTo1950
+secondRatio = areaSecondWindow/areaUpTo1950
+print "change in extent of sea ice in first cooling window =", areaFirstWindow, "square kilometers"
+print "change in extent of sea ice in the second cooling window =", areaSecondWindow, "square kilometers"
+print "ratio in first cooling window to total change prior to 1950 =", firstRatio
+print "ratio in second cooling window to total change prior to 1950 =", secondRatio
+
+# <codecell>
+
+## now we use September data after 1979 and make linear fit and a polynomial 
+## fit to the data
+
+septExtSat = []
+for each in septExt:
+    if each[0] >= 1979:
+        septExtSat.append(each)
+#print septExtSat
+yearSat = []
+extSat = []
+for each in septExtSat:
+    yearSat.append(each[0])
+    extSat.append(each[1])
+## linear fit or polynomial of degree 1    
+coeffLin = polyfit(yearSat, extSat, 1)
+polynomial = poly1d(coeffLin)
+xl = arange(1970, 2080, 1)
+yl = polynomial(xl)
+zeroes = roots(coeffLin)
+#print zeroes
+for each in zeroes:
+    if int(each.real) > 2020:
+        zero = int(each.real)
+print "according to linear fit to satellite data Arctic ice will melt in the year", zero
+fig = plt.figure(figsize=(10, 10))
+plot(yearSat, extSat, 'o')
+plot(xl, yl)
+ylabel('extent of Arctic sea ice in square kilometers')
+xlabel('year')
+title(r'linear fit to September satellite data for Arctic ice extent ')
+show()
+savefig("Ice-extent-satellite-linear-fit.png")
+
+coeffPoly = polyfit(yearSat, extSat, 3)  ## fit polynomial of degree 3
+polynomial = poly1d(coeffPoly)
+xp = arange(1970, 2040, 1)
+yp = polynomial(xp)
+zeroes = roots(coeffPoly)
+#print zeroes
+for each in zeroes:             ## find the year at which ice extent goes to zero
+    if int(each.real) > 2020:
+        zero = int(each.real)
+print "according to polynomial fit to satellite data Arctic ice will melt in the year", zero
+fig = plt.figure(figsize=(10, 10))
+plot(yearSat, extSat, 'o')
+plot(xp, yp)
+ylabel('extent of Arctic sea ice in square kilometers')
+xlabel('year')
+title(r'polynomial fit to September satellite data for Arctic ice extent ')
+show()
+savefig("Ice-extent-satellite-polynomial-fit.png")
+
+# <codecell>
+\end{minted}
+
+

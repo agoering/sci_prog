@@ -1,28 +1,9 @@
-"""Problem Statements"""
-# (DONE) 1. Average the 3 months and differentiate this curve 
-# in 5 year intervals. Plot the resulting slope vectors. Use a finite element approach or another way.
-
-# (DONE) 2. Use a numerical integration technique to compute the total area of the curve from 1870 to 1950 - compare that to the area under the curve from 1950 to 2013
-
-# (DONE) 3. Smooth the waveform (see http://homework.uoregon.edu/pub/class/355/noise.html) via:
-#   a) boxcar of width 5 years
-#   b) gaussian kernel of width 5 years
-#   c) exponential smoothing with greatest weight given to last 20 years
-#    Plot the three waveforms on the same graph and comment on differences in smoothing.
-
-# (DONE) 4. Plot histogram of yearly ratios of July and Sept sea ice extent, comment on patterns
-
-# 5. Window the data and baseline (polynomial fit ok) to extract two cooling periods prior to 1950 that allow sea extent to remain larger than average. Determine the total area of each event, compare to average area from period 1870 to 1950 to determine overall amplitude of cooling.
-
-# 6. When is meltdown? Use two sets of data:
-#   a) entire data set, determine smooth functional form that best fits data, extrapolate to zero. Do not use polynomial fit in this case. Graph fitted line to the data, extrapolated to zero.
-#   b) use only September satellite data. Fit linear regression to the data, also some power or exponential law. Plot two fits on same graph.
-
+\begin{minted}{python}
 import re
 import math
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('PS')
 import matplotlib.pyplot as plt
 
 """Data Import"""
@@ -153,7 +134,7 @@ slope = get_slope(ice_average)
 
 # change of sea ice extent
 early = integrate(1870,1950) # 0.166
-late = integrate(1950,2009) # -3.055 
+late = integrate(1950,2009) # 03.055
 # print early
 # print late
 
@@ -174,46 +155,46 @@ for i in np.arange(0,1,0.1):
     exp_smooth_all.append(exp_smooth)
 
 """Plots"""
-plt.figure(0,figsize=(8,6))
+plt.figure(0)
 plt.plot(ice_average[:,0],ice_average[:,1])
 plt.xlabel('Beginning Year of 5 year period')
 plt.ylabel('Square kilometers')
 plt.title('Area of June-September Arctic sea ice extent, \
   5 year averages')
-plt.savefig('../output/avg_area_five_year.png',bbox_inches='tight')
+plt.savefig('../output/avg_area_five_year')
 
-plt.figure(1,figsize=(8,6))
+plt.figure(1)
 n, bins, patches = plt.hist(ice[:,1]/ice[:,3],20)
 plt.xlabel('Ratio')
 plt.ylabel('Number of Events')
 plt.title('Histogram of ratio of July to September \
   arctic sea ice extent, all years')
-plt.savefig('../output/annual_ratio_hist.png',bbox_inches='tight')
+plt.savefig('../output/annual_ratio_hist')
 
-plt.figure(2,figsize=(8,6))
+plt.figure(2)
 plt.plot(ice[:,0],ice[:,1]/ice[:,3])
 plt.xlabel('Year')
 plt.ylabel('Ratio')
 plt.title('Ratio of July to September arctic sea ice extent, \
   all years')
-plt.savefig('../output/annual_ratio.png',bbox_inches='tight')
+plt.savefig('../output/annual_ratio')
 
-plt.figure(3,figsize=(8,6))
+plt.figure(3)
 plt.plot(slope[:,0],slope[:,1])
 plt.xlabel('Year')
 plt.ylabel('Rate of change, square kilometers/year')
 plt.title('Rate of change of area of June-September \
   Arctic sea ice extent, 5 year averages')
-plt.savefig('../output/slope.png',bbox_inches='tight')
+plt.savefig('../output/slope')
 
-plt.figure(4,figsize=(8,6))
+plt.figure(4)
 plt.plot(annual_average[:,0],annual_average[:,1])
 plt.xlabel('Year')
 plt.ylabel('Square kilometers')
 plt.title('Area of June-September Arctic sea ice extent, all years')
-plt.savefig('../output/avg_area_annual.png',bbox_inches='tight')
+plt.savefig('../output/avg_area_annual')
 
-plt.figure(5,figsize=(8,6))
+plt.figure(5)
 plt.plot(annual_average[:,0],annual_average[:,1],\
   label=r'raw data', color='black')
 plt.plot(box_smooth[:,0],box_smooth[:,1],\
@@ -231,7 +212,7 @@ plt.legend(loc='lower left')
 leg = plt.gca().get_legend()
 ltext  = leg.get_texts()
 plt.setp(ltext, fontsize='small') 
-plt.savefig('../output/smooth_avg_area_annual.png',bbox_inches='tight')
+plt.savefig('../output/smooth_avg_area_annual')
 
 # generate exponentially smoothed plot commands
 # for i in range(10):
@@ -240,41 +221,42 @@ plt.savefig('../output/smooth_avg_area_annual.png',bbox_inches='tight')
 #       exp_smooth_all['+str(i)+'][:,1],label=r\'exponential-smoothed\
 #       data, smoothing parameter '+str(j)+'\')'
 
-# plt.figure(6,figsize=(8,6))
-# plt.plot(exp_smooth_all[1][:,0], exp_smooth_all[1][:,1],\
-#   label=r'exponential-smoothed data, smoothing parameter 0.1')
-# plt.plot(exp_smooth_all[2][:,0], exp_smooth_all[2][:,1],\
-#   label=r'exponential-smoothed data, smoothing parameter 0.2')
-# plt.plot(exp_smooth_all[3][:,0], exp_smooth_all[3][:,1],\
-#   label=r'exponential-smoothed data, smoothing parameter 0.3')
-# plt.xlabel('Year')
-# plt.ylabel('Square kilometers')
-# plt.title('Various Exponentially Smoothed Ice Extent Averages')
-# plt.legend(loc='lower left')
-# plt.savefig('../output/expsmooth123')
+plt.figure(6)
+plt.plot(exp_smooth_all[1][:,0], exp_smooth_all[1][:,1],\
+  label=r'exponential-smoothed data, smoothing parameter 0.1')
+plt.plot(exp_smooth_all[2][:,0], exp_smooth_all[2][:,1],\
+  label=r'exponential-smoothed data, smoothing parameter 0.2')
+plt.plot(exp_smooth_all[3][:,0], exp_smooth_all[3][:,1],\
+  label=r'exponential-smoothed data, smoothing parameter 0.3')
+plt.xlabel('Year')
+plt.ylabel('Square kilometers')
+plt.title('Various Exponentially Smoothed Ice Extent Averages')
+plt.legend(loc='lower left')
+plt.savefig('../output/expsmooth123')
 
-# plt.figure(7,figsize=(8,6))
-# plt.plot(exp_smooth_all[4][:,0], exp_smooth_all[4][:,1],\
-#   label=r'exponential-smoothed data, smoothing parameter 0.4')
-# plt.plot(exp_smooth_all[5][:,0], exp_smooth_all[5][:,1],\
-#   label=r'exponential-smoothed data, smoothing parameter 0.5')
-# plt.plot(exp_smooth_all[6][:,0], exp_smooth_all[6][:,1],\
-#   label=r'exponential-smoothed data, smoothing parameter 0.6')
-# plt.xlabel('Year')
-# plt.ylabel('Square kilometers')
-# plt.title('Various Exponentially Smoothed Ice Extent Averages')
-# plt.legend(loc='lower left')
-# plt.savefig('../output/expsmooth456')
+plt.figure(7)
+plt.plot(exp_smooth_all[4][:,0], exp_smooth_all[4][:,1],\
+  label=r'exponential-smoothed data, smoothing parameter 0.4')
+plt.plot(exp_smooth_all[5][:,0], exp_smooth_all[5][:,1],\
+  label=r'exponential-smoothed data, smoothing parameter 0.5')
+plt.plot(exp_smooth_all[6][:,0], exp_smooth_all[6][:,1],\
+  label=r'exponential-smoothed data, smoothing parameter 0.6')
+plt.xlabel('Year')
+plt.ylabel('Square kilometers')
+plt.title('Various Exponentially Smoothed Ice Extent Averages')
+plt.legend(loc='lower left')
+plt.savefig('../output/expsmooth456')
 
-# plt.figure(8,figsize=(8,6))
-# plt.plot(exp_smooth_all[7][:,0], exp_smooth_all[7][:,1],\
-#   label=r'exponential-smoothed data, smoothing parameter 0.7')
-# plt.plot(exp_smooth_all[8][:,0], exp_smooth_all[8][:,1],\
-#   label=r'exponential-smoothed data, smoothing parameter 0.8')
-# plt.plot(exp_smooth_all[9][:,0], exp_smooth_all[9][:,1],\
-#   label=r'exponential-smoothed data, smoothing parameter 0.9')
-# plt.xlabel('Year')
-# plt.ylabel('Square kilometers')
-# plt.title('Various Exponentially Smoothed Ice Extent Averages')
-# plt.legend(loc='lower left')
-# plt.savefig('../output/expsmooth789')
+plt.figure(8)
+plt.plot(exp_smooth_all[7][:,0], exp_smooth_all[7][:,1],\
+  label=r'exponential-smoothed data, smoothing parameter 0.7')
+plt.plot(exp_smooth_all[8][:,0], exp_smooth_all[8][:,1],\
+  label=r'exponential-smoothed data, smoothing parameter 0.8')
+plt.plot(exp_smooth_all[9][:,0], exp_smooth_all[9][:,1],\
+  label=r'exponential-smoothed data, smoothing parameter 0.9')
+plt.xlabel('Year')
+plt.ylabel('Square kilometers')
+plt.title('Various Exponentially Smoothed Ice Extent Averages')
+plt.legend(loc='lower left')
+plt.savefig('../output/expsmooth789')
+\end{minted}

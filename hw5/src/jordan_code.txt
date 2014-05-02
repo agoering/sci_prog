@@ -1,0 +1,120 @@
+\begin{minted}{python}
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy import trapz
+
+"""
+this whole first part is importing raw data.
+"""
+ice_data =[]
+year_list = []
+avg_list=[]
+with open("icedata.txt", 'r') as f:
+
+	for line in f:
+		l = line.split("	")
+		if int(l[0]) <= 1950:
+			ice_data.append(l[1])
+			ice_data.append(l[2])
+			ice_data.append(l[3])
+			avg_list.append((float(l[1])+float(l[2])+float(l[3]))/3)
+			year_list.append(float(l[0]))
+
+flo_ice = [float(x) for x in ice_data]
+
+#calculate average
+total_avg = []
+for i in flo_ice:
+	total_avg.append(np.average(flo_ice))
+
+#make an x-axis, called p for some reason
+p=[]
+for year in year_list:
+	p.append(year+.583)
+	p.append(year+.666)
+	p.append(year+0.75)
+
+s=[]
+for i in avg_list:
+	s.append(i)
+	s.append(i)
+	s.append(i)
+
+
+zeroed_data = [x-total_avg[1] for x in s]
+
+
+#data windows
+windowed1=[]
+for i in range(len(p)):
+	if not p[i]>=1910 or not p[i]<=1920: 
+		windowed1.append(zeroed_data[i])
+	else:
+		windowed1.append(np.nan)
+
+windowed2=[]
+for i in range(len(p)):
+	if not p[i]>=1940: 
+		windowed2.append(zeroed_data[i])
+	else:
+		windowed2.append(np.nan)
+
+#mask data
+masked1_y = [y for y in windowed1 if y == y]
+masked1_x = [x for x in p if windowed1[p.index(x)]==windowed1[p.index(x)]]
+
+masked2_y = [y for y in windowed2 if y == y]
+masked2_x = [x for x in p if windowed2[p.index(x)]==windowed2[p.index(x)]]
+
+#make baseline
+z=np.polyfit(masked1_x,masked1_y,3)
+f=np.poly1d(z)
+
+w=np.polyfit(masked2_x,masked2_y,3)
+g=np.poly1d(w)
+
+#detrended
+detrended1 = [zeroed_data[p.index(x)] - f(x) for x in p]
+detrended2 = [zeroed_data[p.index(x)] - g(x) for x in p]
+
+#total integral for each
+average_integral1 = trapz(detrended1,p)
+average_integral2 = trapz(detrended2,p)
+
+#integral for 10 year window
+window_integral1 = trapz(detrended1[p.index(1910.583):p.index(1919.75)])
+window_integral2 = trapz(detrended2[p.index(1940.583):p.index(1949.75)])
+
+
+#print results
+#area under window curve compared with overall integral
+#for two window choices
+print window_integral1
+print average_integral1
+
+print window_integral2
+print average_integral2
+
+"""
+RESULTS:
+
+If we consider the window from 1910-1920 we get a cooling magnitude of: 6.94
+compared to an average cooling of: 2.46
+Relative cooling: 4.48
+
+If we consider the window from 1940-1950 we get a cooling magnitude of: 3.250
+compared to an average cooling of: 1.410
+Relative cooling: 1.84
+"""
+
+
+"""Plots"""
+#plt.plot(p,detrended1)
+#plt.plot(p,detrended2)
+plt.plot(p,[0]*len(p))
+plt.plot(p,windowed1)
+#plt.plot(p,zeroed_data)
+plt.plot(p,f(p))
+plt.xlim(p[0]-5,p[-1]+5)
+plt.show()
+\end{minted}

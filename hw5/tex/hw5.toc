@@ -1,0 +1,32 @@
+\contentsline {section}{\numberline {1}Instructions}{1}{section.1}
+\contentsline {section}{\numberline {2}Plotting, averaging, and finding the rate of change of Arctic Sea ice extent}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}General trends}{2}{subsection.2.1}
+\contentsline {paragraph}{}{2}{section*.2}
+\contentsline {subsection}{\numberline {2.2}Sea ice extent change from 1870 to 1950 and from 1950 to 2013}{2}{subsection.2.2}
+\contentsline {paragraph}{}{2}{section*.3}
+\contentsline {paragraph}{}{2}{section*.4}
+\contentsline {section}{\numberline {3}Smoothed sea ice extent data}{5}{section.3}
+\contentsline {paragraph}{}{5}{section*.5}
+\contentsline {paragraph}{}{5}{section*.6}
+\contentsline {paragraph}{}{5}{section*.7}
+\contentsline {paragraph}{}{6}{section*.8}
+\contentsline {paragraph}{}{6}{section*.9}
+\contentsline {section}{\numberline {4}Histogram of summer melting events}{6}{section.4}
+\contentsline {paragraph}{}{6}{section*.10}
+\contentsline {section}{\numberline {5}Pre-1950 cooling events}{7}{section.5}
+\contentsline {subsection}{\numberline {5.1}Attempt 1}{7}{subsection.5.1}
+\contentsline {paragraph}{}{7}{section*.11}
+\contentsline {subsection}{\numberline {5.2}Attempt 2}{7}{subsection.5.2}
+\contentsline {paragraph}{}{7}{section*.12}
+\contentsline {paragraph}{}{9}{section*.13}
+\contentsline {section}{\numberline {6}Extrapolation: visiting Santa via canoe}{9}{section.6}
+\contentsline {subsection}{\numberline {6.1}First attempt}{9}{subsection.6.1}
+\contentsline {paragraph}{}{9}{section*.14}
+\contentsline {subsection}{\numberline {6.2}Fits to satellite data}{9}{subsection.6.2}
+\contentsline {paragraph}{}{9}{section*.15}
+\contentsline {subsection}{\numberline {6.3}Another approach, using Matlab}{14}{subsection.6.3}
+\contentsline {section}{\numberline {7}Code}{19}{section.7}
+\contentsline {paragraph}{}{19}{section*.16}
+\contentsline {subsection}{\numberline {7.1}Andrea's Code}{19}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}Gene's Code}{24}{subsection.7.2}
+\contentsline {subsection}{\numberline {7.3}Jordan's Code}{36}{subsection.7.3}
