@@ -1,0 +1,33 @@
+hw3 To Do
+
+Understand the file format:
+Column 1 is Storm ID
+Column 2 is name of storm
+Column 3,4 is lat/long
+Column 5/6 is wind speed and central pressure
+Column 7 is year
+Column 8 is some running date field in units of hours.
+Column 9 is a descriptor
+
+What options are in descriptor field? Need to identify hurricane events.
+
+Read/write to paste into Google Code with following format:
+Col 0: Decade, begin 1920 end 2010. String, number, date, datetime ok
+Col 1-n: number of hurricanes in pressure bins: number only
+
+Syntax required for input to Google Code:
+       [['str','str','str',...,'str']
+	['str',#,#,#,...,#],
+	[...],
+	[...],
+	[...]]
+ 
+Program determines:
+ - frequency of hurricane events
+ - min(central pressure) for each hurricane event
+
+1. (DONE) Isolate hurricanes only
+2. Isolate distinct storms by decade
+3. Calculate min central pressure for each distinct storm
+4. Define pressure bins
+5. Count frequency of hurricanes, filter by pressure bins
